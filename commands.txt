@@ -1,0 +1,18 @@
+uvicorn app.main:app --reload
+
+create - python -m venv venv
+
+activate - venv\Scripts\activate (for cmd)
+for powershell - venv\Scripts\activate.ps1
+
+
+
+Redis :  open WSL
+start server - sudo service redis-server start
+check - redis-cli ping
+it shsould give PONG
+check keys - redis-cli then keys *
+
+
+celery :
+celery -A app.workers.tasks worker --loglevel=info --pool=solo
