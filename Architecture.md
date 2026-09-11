@@ -139,3 +139,48 @@ Celery Workers - moving heavy/slow stock analysis out of the FastAPI request. Us
 Database
    ↓
 Scheduled analysis
+
+
+
+DATABASE layer --
+we use SQLite + SQLAlchemy
+POST /stocks/analyze
+        ↓
+   Redis cache?
+     ↓      ↓
+   YES      NO
+    ↓        ↓
+ return   Celery task
+              ↓
+       Stock analysis
+              ↓
+       ┌──────┴──────┐
+       ↓             ↓
+     Redis       Database
+     cache       history
+
+Scheduled analysis -- 
+Celery Beat
+    ↓
+Every X minutes/hours
+    ↓
+Celery Task
+    ↓
+Analyze selected stocks
+    ↓
+Save result → DB
+    ↓
+Update Redis cache
+
+Celery Beat is a scheduler.
+You don't want to manually call /stocks/analyze every time.
+Celery Beat automatically says:
+
+"It's time to analyze these stocks." and sends the task to Celery Worker.
+
+to run this create another worker - celery -A app.workers.celery_app beat --loglevel=info
+After ~1 minute, Beat should send the task and the worker should execute it.
+
+Check your DB — a new analysis row should appear every minute.
+
+check tasks.py, celery_app.py

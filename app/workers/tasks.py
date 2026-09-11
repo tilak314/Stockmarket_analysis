@@ -12,6 +12,7 @@ from app.services.decision_validator import validate_decision
 from app.services.decision import get_price_action
 from app.services.risk import calculate_risk_level, calculate_stop_loss
 from app.services.cache import get_cached_analysis, set_cached_analysis
+from app.services.analysis_db import save_analysis
 
 
 # testing celery task
@@ -22,6 +23,24 @@ from app.services.cache import get_cached_analysis, set_cached_analysis
 #         "ticker": ticker,
 #         "status": "completed"
 #     }
+
+WATCHLIST = [
+    "CUPID.NS",
+    "GROWW.NS",
+    "BEL.NS",
+    "TMCV.NS"
+]
+
+# for automatic calling of multiple stocks every 12 hrs
+# how it works
+# Every time the Beat schedule triggers, Celery sends the analyze_watchlist task to the worker, which then creates the individual stock tasks.
+
+
+# @celery.task
+# def analyze_watchlist():
+#     for ticker in WATCHLIST:
+#         analyze_stock_task.delay(ticker)
+
 
 
 @celery.task
@@ -178,6 +197,14 @@ def analyze_stock_task(ticker):
             "company": stock_data["company_name"],
 
             "price": technical_data["current_price"],
+            "scores": {
+                "technical_score": technical_score,
+                "fundamental_score": fundamental_score,
+                "news_score": news_score,
+                "market_score": market_score,
+                "valuation_score": valuation_score,
+                "final_score": final_stock_score
+            },
 
             "recommendation": recommendation.model_dump(),
 
@@ -193,6 +220,7 @@ def analyze_stock_task(ticker):
             "news": news_data
         }
         print("before")
+        save_analysis(result)
         set_cached_analysis(
             ticker,
             result,

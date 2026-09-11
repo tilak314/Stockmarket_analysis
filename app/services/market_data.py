@@ -32,4 +32,3 @@ def get_market_data():
         "trend": trend
     }
 
-print(get_market_data())

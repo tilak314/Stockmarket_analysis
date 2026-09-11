@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 
 from app.api.stock_routes import router as stock_router
+from app.db.init_db import init_db
+
+init_db()
 
 
 app = FastAPI(

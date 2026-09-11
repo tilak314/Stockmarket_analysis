@@ -243,3 +243,6 @@ Buy-zone detection
 Sell alerts
 Daily stock report
 Scheduled news monitoring
+
+
+DATABASE ---

@@ -6,8 +6,6 @@ def calculate_technical_indicators(history: pd.DataFrame):
     
     history = history.dropna(subset=["Close"])
 
-    print(history.tail())
-    print("Current:", history["Close"].iloc[-1])
 
     close = history["Close"]
 

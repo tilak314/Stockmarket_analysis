@@ -15,6 +15,8 @@ from app.services.decision_validator import validate_decision
 from app.services.decision import get_price_action
 from app.services.risk import calculate_risk_level, calculate_stop_loss
 from app.services.cache import get_cached_analysis, set_cached_analysis
+from app.db.database import SessionLocal
+from app.db.models import StockAnalysis
 
 router = APIRouter(
     prefix="/stocks",
@@ -73,6 +75,41 @@ def analyze(request: StockAnalysisRequest):
         "ticker": ticker,
         "status": "processing"
     }
+
+
+@router.get("/{ticker}/history")
+def get_stock_history(ticker: str):
+    db = SessionLocal()
+
+    try:
+        records = (
+            db.query(StockAnalysis)
+            .filter(StockAnalysis.ticker == ticker.upper())
+            .order_by(StockAnalysis.created_at.desc())
+            .all()
+        )
+
+        return {
+            "ticker": ticker.upper(),
+            "count": len(records),
+            "history": [
+                {
+                    "id": record.id,
+                    "company": record.company,
+                    "price": record.current_price,
+                    "recommendation": record.recommendation,
+                    "confidence": record.confidence,
+                    "final_score": record.final_score,
+                    "risk_level": record.risk_level,
+                    "stop_loss": record.stop_loss,
+                    "created_at": record.created_at
+                }
+                for record in records
+            ]
+        }
+
+    finally:
+        db.close()
 
 
 # @router.post("/analyze")

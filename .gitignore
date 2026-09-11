@@ -37,3 +37,7 @@ chroma_db/
 # Temporary files
 *.tmp
 *.temp
+
+# Celery Beat
+celerybeat-schedule
+celerybeat-schedule.*
