@@ -2,6 +2,8 @@ from fastapi import FastAPI
 
 from app.api.stock_routes import router as stock_router
 from app.db.init_db import init_db
+from app.api.document_routes import router as document_router
+from app.api.rag_routes import router as rag_router
 
 init_db()
 
@@ -13,6 +15,8 @@ app = FastAPI(
 
 
 app.include_router(stock_router)
+app.include_router(document_router)
+app.include_router(rag_router)
 
 
 @app.get("/")

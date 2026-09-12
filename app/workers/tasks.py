@@ -13,6 +13,7 @@ from app.services.decision import get_price_action
 from app.services.risk import calculate_risk_level, calculate_stop_loss
 from app.services.cache import get_cached_analysis, set_cached_analysis
 from app.services.analysis_db import save_analysis
+from app.services.vector_store import store_chunks
 
 
 # testing celery task
@@ -237,3 +238,32 @@ def analyze_stock_task(ticker):
             status_code=500,
             detail=str(e)
         )
+
+
+from app.services.embedding_service import generate_embeddings
+from app.services.document_parser import extract_text
+from app.services.text_chunker import chunk_text
+
+@celery.task
+def process_document(file_path, file_id):
+
+    text = extract_text(file_path)
+
+    chunks = chunk_text(text)
+
+    embeddings = generate_embeddings(chunks)
+
+    store_chunks(
+        chunks,
+        embeddings,
+        file_id
+    )
+
+    print("Chunks:", len(chunks))
+    print("Embeddings:", len(embeddings))
+    print("Embedding size:", len(embeddings[0]))
+
+    return {
+        "status": "completed",
+        "chunks": len(chunks)
+    }

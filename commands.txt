@@ -1,4 +1,11 @@
+
+app running - 
 uvicorn app.main:app --reload
+
+celery worker running - 
+celery -A app.workers.tasks worker --loglevel=info --pool=solo
+
+
 
 create - python -m venv venv
 

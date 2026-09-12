@@ -184,3 +184,83 @@ After ~1 minute, Beat should send the task and the worker should execute it.
 Check your DB — a new analysis row should appear every minute.
 
 check tasks.py, celery_app.py
+
+
+
+Agentic Tools -------
+User:
+"Should I consider buying BEL?"
+
+              ↓
+        Stock Research Agent
+              ↓
+     ┌────────┼─────────┐
+     ↓        ↓         ↓
+Stock Data   News      RAG
+   Tool      Tool      Tool
+     ↓        ↓         ↓
+     └────────┼─────────┘
+              ↓
+          Gemini
+              ↓
+       Final analysis
+
+Tools we'll use - 
+Stock Data Tool
+Price
+P/E
+Revenue growth
+ROE, ROA
+Debt
+
+Technical Analysis Tool
+RSI
+SMA20/50/200
+Trend
+
+News Tool
+Recent company news
+
+RAG Tool
+Search company annual reports
+Investor presentations
+Financial documents
+
+Existing Analysis Tools
+Your scoring functions
+Risk calculation
+Buy-zone calculation
+
+
+Agentic behavior
+
+The important part is that the agent decides what to call.
+
+For example:
+"Should I buy BEL for long term considering
+its financials, recent news and annual report?"
+        ↓
+Agent
+ ↓
+Stock Data
+ ↓
+Technical Analysis
+ ↓
+News
+ ↓
+RAG
+ ↓
+Agent combines everything
+ ↓
+Final answer
+
+Plan
+
+Phase 1: Agent + basic tool calling
+Phase 2: Add Stock Data tool
+Phase 3: Add Technical Analysis tool
+Phase 4: Add News tool
+Phase 5: Add RAG tool
+Phase 6: Multi-step agent workflow
+Phase 7: Guardrails + validation
+Phase 8: Integrate agent with your existing /stocks/analyze

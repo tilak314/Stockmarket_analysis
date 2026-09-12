@@ -7,7 +7,8 @@ from google import genai
 from app.models.stock_models import StockRecommendation
 from anthropic import Anthropic
 from openai import OpenAI
-
+from google.genai import types
+from app.services.agent_tools import get_stock_price
 
 load_dotenv()
 
@@ -24,6 +25,28 @@ client2 = Anthropic(
 client3 = OpenAI(
     api_key=os.getenv("OPENAI_KEY")
 )
+
+
+
+def ask_rag(question, context):
+
+    prompt = f"""
+        Answer the user's question using only the provided context.
+
+        Context:
+        {chr(10).join(context)}
+
+        Question:
+        {question}
+    """
+
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt
+    )
+
+    return response.text
+
 
 def analyze_stock(
     stock_data,
@@ -156,3 +179,33 @@ Keep all explanations concise.
     # return result
 
 
+stock_price_tool = types.FunctionDeclaration(
+    name="get_stock_price",
+    description="Get the current stock price and company name.",
+    parameters={
+        "type": "OBJECT",
+        "properties": {
+            "ticker": {
+                "type": "STRING",
+                "description": "Stock ticker symbol, e.g. BEL.NS"
+            }
+        },
+        "required": ["ticker"]
+    }
+)
+
+def run_agent(question):
+
+    tool = types.Tool(
+        function_declarations=[stock_price_tool]
+    )
+
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=question,
+        config=types.GenerateContentConfig(
+            tools=[tool]
+        )
+    )
+
+    return response
